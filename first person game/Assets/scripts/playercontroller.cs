@@ -1,0 +1,155 @@
+using UnityEngine;
+
+
+public class playercontroller : MonoBehaviour
+{
+    [Header("Sprinting")]
+    [SerializeField] float walkSpeed = 4f;
+    [SerializeField] float sprintSpeed = 6f;
+    [SerializeField] float acceleration = 10f;
+
+    [SerializeField] Transform orientation;
+    [Header("Movement")]
+    public float moveSpeed = 6;
+    float movementMultiplier = 10f;
+    [SerializeField] float airMultiplier = 0.4f;
+
+
+    [Header("Jumping")]
+    public float jumpForce = 5f;
+
+    [Header("Keybinds")]
+    [SerializeField] KeyCode jumpKey = KeyCode.Space;
+    [SerializeField] KeyCode sprintKey = KeyCode.LeftShift;
+
+    [Header("Drag")]
+    float groundDrag = 6f;
+    float airDrag = 2f;
+
+    float playerHeight = 2f;
+    float horizontalMovement;
+    float verticalMovement;
+   
+    float rbDrag = 6f;
+    Vector3 moveDirection;
+    Vector3 slopeMoveDirection;
+    Rigidbody rb;
+
+    [Header("Ground Detection")]
+    bool isGrounded;
+    [SerializeField] Transform groundCheck;
+    [SerializeField] float groundDistance = 0.4f;
+    [SerializeField] LayerMask groundMask;
+
+    [Header("Health")]
+    [SerializeField] float health = 100f;
+
+    RaycastHit slopeHit;
+
+    private bool OnSlope()
+    {
+        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight / 2 + 0.5f))
+        {
+            if (slopeHit.normal != Vector3.up)
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true;
+    }
+    private void Update()
+    {
+        if (health <= 0)
+        {
+            Debug.Log("dead");
+        }
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+        MyInput();
+        ControlDrag();
+        ControlSpeed();
+
+        if (Input.GetKeyDown(jumpKey) && isGrounded)
+        {
+            Jump();
+        }
+        slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+    }
+    void Jump()
+    {
+        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+    void ControlSpeed()
+    {
+        if (Input.GetKey(sprintKey) && isGrounded)
+        {
+            moveSpeed = Mathf.Lerp(moveSpeed, sprintSpeed, acceleration * Time.deltaTime);
+        }
+        else
+        {
+            moveSpeed = Mathf.Lerp(moveSpeed, walkSpeed, acceleration * Time.deltaTime);
+        }
+    }
+    void ControlDrag()
+    {
+        if (isGrounded)
+        {
+            rb.drag = groundDrag;
+        } 
+        else if (!isGrounded)
+        {
+            rb.drag = airDrag;
+        }
+    }
+    void MyInput()
+    {
+        horizontalMovement = Input.GetAxisRaw("Horizontal");
+        verticalMovement = Input.GetAxisRaw("Vertical");
+
+        moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
+
+    }
+    private void FixedUpdate()
+    {
+        MovePlayer();
+    }
+    void MovePlayer()
+    {
+        if (isGrounded && !OnSlope())
+        {
+            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
+
+        } 
+        else if (isGrounded && OnSlope())
+        {
+            rb.AddForce(slopeMoveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
+
+        }
+        else if (!isGrounded)
+        {
+            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration);
+
+        }
+
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "EnemyBullet")
+        {
+            Debug.Log("take damage");
+            health -= 10f;
+        }
+
+    }
+
+}
