@@ -31,6 +31,13 @@ public class Gun : MonoBehaviour
             {
                 RocketLauncher();
             }
+            else if (WeaponSwitching.selectedWeapon == 2)
+            {
+                if (Input.GetKey(KeyCode.Mouse1)) 
+                { 
+                    sniperRifle();
+                }
+            }
 
         }
        
@@ -79,5 +86,25 @@ public class Gun : MonoBehaviour
         bullet.GetComponent<Rigidbody>().velocity = (destination - bulletSpawn.position).normalized * bulletSpeed;
 
         Destroy(bullet, lifeTime);
+    }
+    void sniperRifle()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(fpsCam.transform.position, fpsCam.transform.forward, out hit, range))
+        {
+            Debug.Log(hit.transform.name);
+
+            Target target = hit.transform.GetComponent<Target>();
+            if (target != null)
+            {
+                target.TakeDamage(50f);
+            }
+            if (hit.rigidbody != null)
+            {
+                hit.rigidbody.AddForce(-hit.normal * impactForce);
+            }
+            GameObject impactGameObject = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            Destroy(impactGameObject, 2f);
+        }
     }
 }
