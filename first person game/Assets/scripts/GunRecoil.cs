@@ -19,11 +19,10 @@ public class GunRecoil : MonoBehaviour
     Vector3 rotationalRecoil;
     Vector3 positionalRecoil;
     Vector3 Rot;
-
-
+    
     private void FixedUpdate()
     {
-      
+        
         rotationalRecoil = Vector3.Lerp(rotationalRecoil, Vector3.zero, rotationalReturnSpeed * Time.deltaTime);
         positionalRecoil = Vector3.Lerp(positionalRecoil, Vector3.zero, positionalReturnSpeed * Time.deltaTime);
 
@@ -34,12 +33,15 @@ public class GunRecoil : MonoBehaviour
     }
     private void Update()
     {
-       
         if (Input.GetButtonDown("Fire1"))
-        {
-            rotationalRecoil += new Vector3(-RecoilRotation.x, Random.Range(-RecoilRotation.y, RecoilRotation.y), Random.Range(-RecoilRotation.z, RecoilRotation.z));
-            positionalRecoil += new Vector3(Random.Range(-RecoilKickBack.x, RecoilKickBack.x), Random.Range(-RecoilKickBack.y, RecoilKickBack.y), RecoilKickBack.z);
+        { 
+            if (Gun.canShoot == true)
+            { 
+                print("also here");
+                rotationalRecoil += new Vector3(-RecoilRotation.x, Random.Range(-RecoilRotation.y, RecoilRotation.y), Random.Range(-RecoilRotation.z, RecoilRotation.z));
+                positionalRecoil += new Vector3(Random.Range(-RecoilKickBack.x, RecoilKickBack.x), Random.Range(-RecoilKickBack.y, RecoilKickBack.y), RecoilKickBack.z);
+            }
         }
-        
     }
+    
 }

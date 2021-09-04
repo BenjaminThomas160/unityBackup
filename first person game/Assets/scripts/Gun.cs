@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class Gun : MonoBehaviour
@@ -11,6 +13,13 @@ public class Gun : MonoBehaviour
     public GameObject rocketBullet;
     public Transform bulletSpawn;
     public float bulletSpeed = 30f;
+    [Header("bool")]
+    [SerializeField] public static bool canShoot = true;
+
+    public float pistolDelay = 0.5f;
+    public float rocketDelay = 1f;
+    public float sniperDelay = 1f;
+
 
     public float lifeTime = 3f;
 
@@ -21,24 +30,31 @@ public class Gun : MonoBehaviour
     public Camera fpsCam;
     void Update()
     {
-        if (Input.GetButtonDown("Fire1")) 
+        if (canShoot == true)
         {
-            if (WeaponSwitching.selectedWeapon == 0)
+            if (Input.GetButtonDown("Fire1"))
             {
-                Shoot();
-            }
-            else if (WeaponSwitching.selectedWeapon == 1)
-            {
-                RocketLauncher();
-            }
-            else if (WeaponSwitching.selectedWeapon == 2)
-            {
-                if (Input.GetKey(KeyCode.Mouse1)) 
-                { 
-                    sniperRifle();
-                }
-            }
+                if (WeaponSwitching.selectedWeapon == 0)
+                {
+                    Shoot();
+                    StartCoroutine(ShootDelay(pistolDelay));
 
+                }
+                else if (WeaponSwitching.selectedWeapon == 1)
+                {
+                    RocketLauncher();
+                    StartCoroutine(ShootDelay(rocketDelay));
+                }
+                else if (WeaponSwitching.selectedWeapon == 2)
+                {
+                    if (Input.GetKey(KeyCode.Mouse1))
+                    {
+                        sniperRifle();
+                        StartCoroutine(ShootDelay(sniperDelay));
+                    }
+                }
+
+            }
         }
        
     }
@@ -106,5 +122,13 @@ public class Gun : MonoBehaviour
             GameObject impactGameObject = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
             Destroy(impactGameObject, 2f);
         }
+    }
+    IEnumerator ShootDelay(float delay)
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        canShoot = false;
+        yield return new WaitForSeconds(delay);
+        canShoot = true;
     }
 }

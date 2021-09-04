@@ -7661,6 +7661,18 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1869581977}
     - target: {fileID: 4555461994966797388, guid: 0a600a3ad60c5294788910fbb10eb9aa, type: 3}
+      propertyPath: pistolDelay
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4555461994966797388, guid: 0a600a3ad60c5294788910fbb10eb9aa, type: 3}
+      propertyPath: rocketDelay
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4555461994966797388, guid: 0a600a3ad60c5294788910fbb10eb9aa, type: 3}
+      propertyPath: sniperDelay
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4555461994966797388, guid: 0a600a3ad60c5294788910fbb10eb9aa, type: 3}
       propertyPath: rocketBullet
       value: 
       objectReference: {fileID: 3900170478745156129, guid: 7ec7ee320eaa59948bd08d507f525834, type: 3}
